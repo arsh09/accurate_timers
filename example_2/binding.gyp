@@ -1,8 +1,8 @@
 {
   "targets": [
     {
-      "target_name": "example",
-      "sources": [ "example.cpp", "example_wrap.cxx" ],
+      "target_name": "timer",
+      "sources": ["Timer.h", "timer_wrap.cxx" ],
       "include_dirs": [ "." ],
       "cflags": [ "-std=c++11" ],
       "cflags_cc": [ "-std=c++11" ],

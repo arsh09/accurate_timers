@@ -1375,11 +1375,9 @@ fail: ;
 
 /* -------- TYPES TABLE (BEGIN) -------- */
 
-#define SWIGTYPE_p_Timer swig_types[0]
-#define SWIGTYPE_p_char swig_types[1]
-#define SWIGTYPE_p_f___void swig_types[2]
-static swig_type_info *swig_types[4];
-static swig_module_info swig_module = {swig_types, 3, 0, 0, 0, 0};
+#define SWIGTYPE_p_char swig_types[0]
+static swig_type_info *swig_types[2];
+static swig_module_info swig_module = {swig_types, 1, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1448,116 +1446,20 @@ template <typename T> T SwigValueInit() {
 #include "example.h"
 
 
-SWIGINTERN
-int SWIG_AsVal_int (SWIGV8_VALUE valRef, int* val)
-{
-  if (!valRef->IsNumber()) {
-    return SWIG_TypeError;
-  }
-  if(val) *val = SWIGV8_INTEGER_VALUE(valRef);
-
-  return SWIG_OK;
-}
+#define SWIGV8_INIT example_initialize
 
 
-#define SWIGV8_INIT timer_initialize
 
 
-SWIGV8_ClientData _exports_Timer_clientData;
-
-
-static SwigV8ReturnValue _wrap_new_Timer(const SwigV8Arguments &args) {
-  SWIGV8_HANDLESCOPE();
-  
-  SWIGV8_OBJECT self = args.Holder();
-  Timer *result;
-  if(self->InternalFieldCount() < 1) SWIG_exception_fail(SWIG_ERROR, "Illegal call of constructor _wrap_new_Timer.");
-  if(args.Length() < 0 || args.Length() > 0) SWIG_exception_fail(SWIG_ERROR, "Illegal number of arguments for _wrap_new_Timer.");
-  result = (Timer *)new Timer();
-  
-  
-  
-  SWIGV8_SetPrivateData(self, result, SWIGTYPE_p_Timer, SWIG_POINTER_OWN);
-  SWIGV8_RETURN(self);
-  
-  goto fail;
-fail:
-  SWIGV8_RETURN(SWIGV8_UNDEFINED());
-}
-
-
-static void _wrap_delete_Timer(const v8::WeakCallbackInfo<SWIGV8_Proxy> &data) {
-  SWIGV8_Proxy *proxy = data.GetParameter();
-  
-  if(proxy->swigCMemOwn && proxy->swigCObject) {
-    Timer * arg1 = (Timer *)proxy->swigCObject;
-    delete arg1;
-  }
-  delete proxy;
-}
-
-
-static SwigV8ReturnValue _wrap_Timer_start(const SwigV8Arguments &args) {
+static SwigV8ReturnValue _wrap_greet(const SwigV8Arguments &args) {
   SWIGV8_HANDLESCOPE();
   
   SWIGV8_VALUE jsresult;
-  Timer *arg1 = (Timer *) 0 ;
-  int arg2 ;
-  Callback arg3 = (Callback) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
   
-  if (args.Length() < 2 || args.Length() > 2) SWIG_exception_fail(SWIG_ERROR, "Illegal number of arguments for _wrap_Timer_start.");
+  if (args.Length() < 0 || args.Length() > 0) SWIG_exception_fail(SWIG_ERROR, "Illegal number of arguments for _wrap_greet.");
   
-  res1 = SWIG_ConvertPtr(args.Holder(), &argp1,SWIGTYPE_p_Timer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Timer_start" "', argument " "1"" of type '" "Timer *""'"); 
-  }
-  arg1 = reinterpret_cast< Timer * >(argp1);ecode2 = SWIG_AsVal_int(args[0], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Timer_start" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = static_cast< int >(val2);{
-    {
-      int res = SWIG_ConvertFunctionPtr(args[1], (void**)(&arg3), SWIGTYPE_p_f___void);
-      if (!SWIG_IsOK(res)) {
-        SWIG_exception_fail(SWIG_ArgError(res), "in method '" "Timer_start" "', argument " "3"" of type '" "Callback""'"); 
-      }
-    }
-  }
-  (arg1)->start(arg2,arg3);
+  greet();
   jsresult = SWIGV8_UNDEFINED();
-  
-  
-  
-  
-  SWIGV8_RETURN(jsresult);
-  
-  goto fail;
-fail:
-  SWIGV8_RETURN(SWIGV8_UNDEFINED());
-}
-
-
-static SwigV8ReturnValue _wrap_Timer_stop(const SwigV8Arguments &args) {
-  SWIGV8_HANDLESCOPE();
-  
-  SWIGV8_VALUE jsresult;
-  Timer *arg1 = (Timer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  
-  if (args.Length() < 0 || args.Length() > 0) SWIG_exception_fail(SWIG_ERROR, "Illegal number of arguments for _wrap_Timer_stop.");
-  
-  res1 = SWIG_ConvertPtr(args.Holder(), &argp1,SWIGTYPE_p_Timer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Timer_stop" "', argument " "1"" of type '" "Timer *""'"); 
-  }
-  arg1 = reinterpret_cast< Timer * >(argp1);(arg1)->stop();
-  jsresult = SWIGV8_UNDEFINED();
-  
   
   SWIGV8_RETURN(jsresult);
   
@@ -1569,24 +1471,16 @@ fail:
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
-static swig_type_info _swigt__p_Timer = {"_p_Timer", "p_Timer|Timer *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_f___void = {"_p_f___void", "Callback|void (*)()", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
-  &_swigt__p_Timer,
   &_swigt__p_char,
-  &_swigt__p_f___void,
 };
 
-static swig_cast_info _swigc__p_Timer[] = {  {&_swigt__p_Timer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_f___void[] = {  {&_swigt__p_f___void, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
-  _swigc__p_Timer,
   _swigc__p_char,
-  _swigc__p_f___void,
 };
 
 
@@ -1896,42 +1790,23 @@ void SWIGV8_INIT (SWIGV8_OBJECT exports_obj, SWIGV8_VALUE /*module*/, v8::Local<
   
 
   /* create class templates */
-  /* Name: _exports_Timer, Type: p_Timer, Dtor: _wrap_delete_Timer */
-SWIGV8_FUNCTION_TEMPLATE _exports_Timer_class = SWIGV8_CreateClassTemplate("_exports_Timer");
-SWIGV8_SET_CLASS_TEMPL(_exports_Timer_clientData.class_templ, _exports_Timer_class);
-_exports_Timer_clientData.dtor = _wrap_delete_Timer;
-if (SWIGTYPE_p_Timer->clientdata == 0) {
-  SWIGTYPE_p_Timer->clientdata = &_exports_Timer_clientData;
-}
-
+  
 
   /* register wrapper functions */
-  SWIGV8_AddMemberFunction(_exports_Timer_class, "start", _wrap_Timer_start);
-SWIGV8_AddMemberFunction(_exports_Timer_class, "stop", _wrap_Timer_stop);
-
+  
 
   /* setup inheritances */
   
 
   /* class instances */
-  /* Class: Timer (_exports_Timer) */
-SWIGV8_FUNCTION_TEMPLATE _exports_Timer_class_0 = SWIGV8_CreateClassTemplate("Timer");
-_exports_Timer_class_0->SetCallHandler(_wrap_new_Timer);
-_exports_Timer_class_0->Inherit(_exports_Timer_class);
-#if (SWIG_V8_VERSION < 0x0704)
-_exports_Timer_class_0->SetHiddenPrototype(true);
-v8::Local<v8::Object> _exports_Timer_obj = _exports_Timer_class_0->GetFunction();
-#else
-v8::Local<v8::Object> _exports_Timer_obj = _exports_Timer_class_0->GetFunction(context).ToLocalChecked();
-#endif
-
-
-  /* add static class functions and variables */
   
 
-  /* register classes */
-  SWIGV8_MAYBE_CHECK(exports_obj->Set(context, SWIGV8_SYMBOL_NEW("Timer"), _exports_Timer_obj));
+  /* add static class functions and variables */
+  SWIGV8_AddStaticFunction(exports_obj, "greet", _wrap_greet, context);
 
+
+  /* register classes */
+  
 
   /* create and register namespace objects */
   
@@ -1939,8 +1814,8 @@ v8::Local<v8::Object> _exports_Timer_obj = _exports_Timer_class_0->GetFunction(c
 
 #if defined(BUILDING_NODE_EXTENSION)
 #if (NODE_MODULE_VERSION < 64)
-NODE_MODULE(timer, timer_initialize)
+NODE_MODULE(example, example_initialize)
 #else
-NODE_MODULE_CONTEXT_AWARE(timer, timer_initialize)
+NODE_MODULE_CONTEXT_AWARE(example, example_initialize)
 #endif
 #endif
