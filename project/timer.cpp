@@ -9,9 +9,9 @@ class AccurateTimer
 {
 public:
     AccurateTimer(){}
-    // AccurateTimer(napi_env env) : env_(env), callback_(nullptr), active_(false) {}
-    AccurateTimer(napi_env env, napi_value callback) 
-    : env(env), active_(false), js_callback_ref(nullptr) {
+
+    AccurateTimer(napi_env env, napi_value callback, int delay) 
+    : env(env), delay_(delay), js_callback_ref(nullptr) {
 
         napi_status status;
         napi_value fn_name; 
@@ -31,29 +31,21 @@ public:
             CallJs,
             &js_callback_ref
         );
-        assert(status == napi_ok);
+        napi_throw_error(env, nullptr, "Unable to set the thread-safe callback for the AccurateTimer")
+
     }
 
     ~AccurateTimer() { 
+        Stop();
         napi_release_threadsafe_function(js_callback_ref, napi_tsfn_release);
     }
-
-    void Say()
-    {
-        std::cout << "Hello there!" << std::endl;
-    }
-
-    void Start(int delay) {
-
-        if (active_) {
-            Stop();
-        }
+ 
+    void Start() {
         active_ = true;
-        worker = std::thread([this, delay]() {
+        worker = std::thread([this]() {
             while (active_)
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-                std::cout << "Hello there! " << delay << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(delay_));
                 napi_call_threadsafe_function(js_callback_ref, nullptr, napi_tsfn_blocking);
             }
         });
@@ -61,6 +53,7 @@ public:
     }
 
     void Stop() {
+        counter_ = 0;
         active_ = false;
         if ( worker.joinable() ) { worker.join(); }
     }
@@ -77,86 +70,70 @@ private:
     napi_threadsafe_function js_callback_ref;
     std::atomic<bool> active_;
     std::thread worker;
+    int delay_ ;
+    uint32_t counter_ = 0;
     
 };
 
+ 
+napi_value StartTimer(napi_env env, napi_callback_info info) {
 
-
-napi_value CreateTimer(napi_env env, napi_callback_info info) {
     size_t argc = 2;
     napi_value args[2];
-    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    napi_status ret_err_;
+    napi_value jsthis;
 
-    int delay;
-    napi_get_value_int32(env, args[0], &delay);
+    ret_err_ = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the timer callback arguments") }
 
-    AccurateTimer* timer = new AccurateTimer(env, args[1]);
-    timer->Start(delay);
+    AccurateTimer* timer;
+    ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&timer));
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to wrap the class pointer") }
+ 
+    if (timer!=nullptr){
+        timer->Start();
+    } 
 
-    napi_value result;
-    napi_get_undefined(env, &result);
-    return result;
+    return nullptr;
 }
 
-// napi_value StartTimer(napi_env env, napi_callback_info info) {
+napi_value StopTimer(napi_env env, napi_callback_info info) {
+    napi_value jsthis;
+    napi_status ret_err_;
 
-//     size_t argc = 2;
-//     napi_value args[2];
-//     napi_status ret_err_;
-//     napi_value jsthis;
+    ret_err_ = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
+    if (ret_err_ != napi_ok) {  napi_throw_error(env, nullptr, "Unable to get the timer callback arguments") }
 
-//     ret_err_ = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-//     if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_cb_info()" << std::endl; }
+    AccurateTimer* timer;
+    ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&timer));
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to unwrap the AccurateTimer class pointer") }
 
-//     AccurateTimer* obj;
-//     ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
-//     if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_unwrap()" << std::endl; }
+    if (timer !=nullptr){
+        timer->Stop();
+    }
 
-//     int delay;
-//     ret_err_ = napi_get_value_int32(env, args[0], &delay);
-//     if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_value_int32()" << std::endl; }
-
-//     std::cout << "Delay: " << (int) delay << std::endl;
-  
-//     if (obj!=nullptr){
-//         obj->Say();
-//         obj->Start(delay, args[1]);
-//     } 
-
-//     return nullptr;
-// }
-
-// napi_value StopTimer(napi_env env, napi_callback_info info) {
-//     napi_value jsthis;
-//     napi_status ret_err_;
-
-//     ret_err_ = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
-//     if (ret_err_ != napi_ok) { std::cout << "StopTimer: napi_get_cb_info()" << std::endl; }
-
-//     AccurateTimer* obj;
-//     ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
-//     if (ret_err_ != napi_ok) { std::cout << "StopTimer: napi_unwrap()" << std::endl; }
-
-//     if (obj !=nullptr){
-//         obj->Stop();
-//     }
-
-//     return nullptr;
-// }
-
-
+    return nullptr;
+}
+ 
 napi_value NewTimer(napi_env env, napi_callback_info info) {
+
+    size_t argc = 2;
+    napi_value args[2];
 
     napi_status ret_err_;
     napi_value jsthis;
-    napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
+    ret_err_ = napi_get_cb_info(env, info, &argc, args, &jsthis, nullptr);
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the timer callback arguments") }
 
-    AccurateTimer* obj = new AccurateTimer();
-    ret_err_ = napi_wrap(env, jsthis, obj, [](napi_env env, void* finalize_data, void* hint) {
+    int delay; 
+    ret_err_ = napi_get_value_int32(env, args[0], &delay);
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the delay value for the timer") }
+
+    AccurateTimer* timer = new AccurateTimer(env, args[1], delay);
+    ret_err_ = napi_wrap(env, jsthis, timer, [](napi_env env, void* finalize_data, void* hint) {
         delete static_cast<AccurateTimer*>(finalize_data);
     }, nullptr, nullptr);
-
-    if (ret_err_ != napi_ok) { std::cout << "NewTimer: napi_wrap()" << std::endl; }
+    if (ret_err_ != napi_ok) {napi_throw_error(env, nullptr, "Unable to wrap the AccurateTimer class") }
 
     return jsthis;
 }
@@ -165,9 +142,8 @@ napi_value Init(napi_env env, napi_value exports) {
     napi_value js_class;
 
     napi_property_descriptor desc[] = {
-        {"createTimer", nullptr, CreateTimer, nullptr, nullptr, nullptr, napi_default, nullptr},
-        // {"start", nullptr, StartTimer, nullptr, nullptr, nullptr, napi_default, nullptr},
-        // {"stop", nullptr, StopTimer, nullptr, nullptr, nullptr, napi_default, nullptr}
+        {"start", nullptr, StartTimer, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"stop", nullptr, StopTimer, nullptr, nullptr, nullptr, napi_default, nullptr}
     };
 
     size_t desc_count = sizeof(desc) / sizeof(*desc);
@@ -177,7 +153,6 @@ napi_value Init(napi_env env, napi_value exports) {
 
     return exports;
 }
-
 
 
 NAPI_MODULE(NODE_GYP_MODULE_NAME, Init)
