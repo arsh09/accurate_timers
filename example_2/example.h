@@ -13,7 +13,8 @@ class Timer {
 public:
     Timer();
     ~Timer();
-    void start(int duration, Callback callback);
+    // void start(int duration, Callback callback);
+    void Timer::start(int duration, int (*cb)());
     void stop();
 private:
     std::thread timerThread;
