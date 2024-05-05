@@ -3,35 +3,26 @@
 #include <thread>
 #include <functional>
 #include <iostream>
+#include <assert.h>
 
 class AccurateTimer 
 {
 public:
     AccurateTimer(){}
-    AccurateTimer(napi_env env) : env_(env), callback_(nullptr), active_(false) {}
-    ~AccurateTimer() {
-        if (callback_) {
-            napi_delete_reference(env_, callback_);
-        }
-    }
+    // AccurateTimer(napi_env env) : env_(env), callback_(nullptr), active_(false) {}
+    AccurateTimer(napi_env env, napi_value callback) 
+    : env(env), active_(false), js_callback_ref(nullptr) {
 
-    void Say()
-    {
-        std::cout << "Hello there!" << std::endl;
-    }
+        napi_status status;
+        napi_value fn_name; 
+        status = napi_create_string_utf8(env, "Timer Callback", NAPI_AUTO_LENGTH, &fn_name),
+        assert( status == napi_ok );
 
-    void Start(int delay, napi_value callback) {
-
-        if (active_) {
-            Stop();
-        }
-
-        napi_status status = napi_create_threadsafe_function(
-            env_,
+        status = napi_create_threadsafe_function(
+            env,
             callback,
             nullptr,
-            nullptr,
-            // napi_create_string_utf8(env_, "Timer Callback", NAPI_AUTO_LENGTH),
+            fn_name,
             0,
             1,
             nullptr,
@@ -40,21 +31,32 @@ public:
             CallJs,
             &js_callback_ref
         );
-        
-        if (status != napi_ok) { std::cout << "Start: napi_create_threadsafe_function() " << status << std::endl; }
+        assert(status == napi_ok);
+    }
 
+    ~AccurateTimer() { 
+        napi_release_threadsafe_function(js_callback_ref, napi_tsfn_release);
+    }
 
+    void Say()
+    {
+        std::cout << "Hello there!" << std::endl;
+    }
+
+    void Start(int delay) {
+
+        if (active_) {
+            Stop();
+        }
         active_ = true;
         worker = std::thread([this, delay]() {
-            if (active_)
+            while (active_)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-                std::cout << "Timer ends " << std::endl;
+                std::cout << "Hello there! " << delay << std::endl;
                 napi_call_threadsafe_function(js_callback_ref, nullptr, napi_tsfn_blocking);
             }
-           
         });
-
         worker.detach();
     }
 
@@ -71,10 +73,9 @@ public:
     }
 
 private:
-    napi_env env_;
-    napi_ref callback_;
+    napi_env env;
     napi_threadsafe_function js_callback_ref;
-    bool active_;
+    std::atomic<bool> active_;
     std::thread worker;
     
 };
@@ -82,84 +83,66 @@ private:
 
 
 napi_value CreateTimer(napi_env env, napi_callback_info info) {
-    napi_value jsthis;
-    napi_valuetype val_type;
-    napi_status ret_err_;
-    
-    ret_err_= napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
-    if (ret_err_ != napi_ok) { std::cout << "CreateTimer: napi_get_cb_info()" << std::endl; }
-
-    AccurateTimer* obj;
-    ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
-    if (ret_err_ != napi_ok) { std::cout << "CreateTimer: napi_unwrap() " << ret_err_ << std::endl; }
-
-    return jsthis;
-}
-
-napi_value StartTimer(napi_env env, napi_callback_info info) {
     size_t argc = 2;
     napi_value args[2];
-    napi_status ret_err_;
-    napi_value jsthis;
-
-    ret_err_ = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_cb_info()" << std::endl; }
-
-    AccurateTimer* obj;
-    ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_unwrap()" << std::endl; }
+    napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
 
     int delay;
-    ret_err_ = napi_get_value_int32(env, args[0], &delay);
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_value_int32()" << std::endl; }
+    napi_get_value_int32(env, args[0], &delay);
 
-    std::cout << "Delay: " << (int) delay << std::endl;
- 
-    // // test if the function gets called
-    // napi_ref callback_;
-    // napi_handle_scope scope;
-    // napi_value global;
-    // napi_value cb;
-    // napi_value result;
+    AccurateTimer* timer = new AccurateTimer(env, args[1]);
+    timer->Start(delay);
 
-    // ret_err_ = napi_create_reference(env, args[1], 1, &callback_);
-    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_create_reference()" << std::endl; }
-    // ret_err_ = napi_open_handle_scope(env, &scope);
-    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_open_handle_scope()" << std::endl; }
-    // ret_err_ = napi_get_global(env, &global);
-    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_global()" << std::endl; }
-    // ret_err_ = napi_get_reference_value(env, callback_, &cb);
-    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_reference_value()" << std::endl; }
-    // ret_err_ = napi_call_function(env, global, cb, 0, nullptr, &result);
-    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_call_function()" << std::endl; }
-    // ret_err_ = napi_close_handle_scope(env, scope);
-    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_close_handle_scope()" << std::endl; }
-
-    if (obj!=nullptr){
-        obj->Say();
-        obj->Start(delay, args[1]);
-    } 
-
-    return nullptr;
+    napi_value result;
+    napi_get_undefined(env, &result);
+    return result;
 }
 
-napi_value StopTimer(napi_env env, napi_callback_info info) {
-    napi_value jsthis;
-    napi_status ret_err_;
+// napi_value StartTimer(napi_env env, napi_callback_info info) {
 
-    ret_err_ = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
-    if (ret_err_ != napi_ok) { std::cout << "StopTimer: napi_get_cb_info()" << std::endl; }
+//     size_t argc = 2;
+//     napi_value args[2];
+//     napi_status ret_err_;
+//     napi_value jsthis;
 
-    AccurateTimer* obj;
-    ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
-    if (ret_err_ != napi_ok) { std::cout << "StopTimer: napi_unwrap()" << std::endl; }
+//     ret_err_ = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+//     if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_cb_info()" << std::endl; }
 
-    if (obj !=nullptr){
-        obj->Stop();
-    }
+//     AccurateTimer* obj;
+//     ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
+//     if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_unwrap()" << std::endl; }
 
-    return nullptr;
-}
+//     int delay;
+//     ret_err_ = napi_get_value_int32(env, args[0], &delay);
+//     if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_value_int32()" << std::endl; }
+
+//     std::cout << "Delay: " << (int) delay << std::endl;
+  
+//     if (obj!=nullptr){
+//         obj->Say();
+//         obj->Start(delay, args[1]);
+//     } 
+
+//     return nullptr;
+// }
+
+// napi_value StopTimer(napi_env env, napi_callback_info info) {
+//     napi_value jsthis;
+//     napi_status ret_err_;
+
+//     ret_err_ = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
+//     if (ret_err_ != napi_ok) { std::cout << "StopTimer: napi_get_cb_info()" << std::endl; }
+
+//     AccurateTimer* obj;
+//     ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
+//     if (ret_err_ != napi_ok) { std::cout << "StopTimer: napi_unwrap()" << std::endl; }
+
+//     if (obj !=nullptr){
+//         obj->Stop();
+//     }
+
+//     return nullptr;
+// }
 
 
 napi_value NewTimer(napi_env env, napi_callback_info info) {
@@ -183,8 +166,8 @@ napi_value Init(napi_env env, napi_value exports) {
 
     napi_property_descriptor desc[] = {
         {"createTimer", nullptr, CreateTimer, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"start", nullptr, StartTimer, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"stop", nullptr, StopTimer, nullptr, nullptr, nullptr, napi_default, nullptr}
+        // {"start", nullptr, StartTimer, nullptr, nullptr, nullptr, napi_default, nullptr},
+        // {"stop", nullptr, StopTimer, nullptr, nullptr, nullptr, napi_default, nullptr}
     };
 
     size_t desc_count = sizeof(desc) / sizeof(*desc);
