@@ -1377,8 +1377,9 @@ fail: ;
 
 #define SWIGTYPE_p_Timer swig_types[0]
 #define SWIGTYPE_p_char swig_types[1]
-static swig_type_info *swig_types[3];
-static swig_module_info swig_module = {swig_types, 2, 0, 0, 0, 0};
+#define SWIGTYPE_p_f___void swig_types[2]
+static swig_type_info *swig_types[4];
+static swig_module_info swig_module = {swig_types, 3, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1448,13 +1449,18 @@ template <typename T> T SwigValueInit() {
 
 
 SWIGINTERN
-SWIGV8_VALUE SWIG_From_double   (double val)
+int SWIG_AsVal_int (SWIGV8_VALUE valRef, int* val)
 {
-  return SWIGV8_NUMBER_NEW(val);
+  if (!valRef->IsNumber()) {
+    return SWIG_TypeError;
+  }
+  if(val) *val = SWIGV8_INTEGER_VALUE(valRef);
+
+  return SWIG_OK;
 }
 
 
-#define SWIGV8_INIT example_initialize
+#define SWIGV8_INIT timer_initialize
 
 
 SWIGV8_ClientData _exports_Timer_clientData;
@@ -1480,59 +1486,6 @@ fail:
 }
 
 
-static SwigV8ReturnValue _wrap_Timer_reset(const SwigV8Arguments &args) {
-  SWIGV8_HANDLESCOPE();
-  
-  SWIGV8_VALUE jsresult;
-  Timer *arg1 = (Timer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  
-  if (args.Length() < 0 || args.Length() > 0) SWIG_exception_fail(SWIG_ERROR, "Illegal number of arguments for _wrap_Timer_reset.");
-  
-  res1 = SWIG_ConvertPtr(args.Holder(), &argp1,SWIGTYPE_p_Timer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Timer_reset" "', argument " "1"" of type '" "Timer *""'"); 
-  }
-  arg1 = reinterpret_cast< Timer * >(argp1);(arg1)->reset();
-  jsresult = SWIGV8_UNDEFINED();
-  
-  
-  SWIGV8_RETURN(jsresult);
-  
-  goto fail;
-fail:
-  SWIGV8_RETURN(SWIGV8_UNDEFINED());
-}
-
-
-static SwigV8ReturnValue _wrap_Timer_elapsed(const SwigV8Arguments &args) {
-  SWIGV8_HANDLESCOPE();
-  
-  SWIGV8_VALUE jsresult;
-  Timer *arg1 = (Timer *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  double result;
-  
-  if (args.Length() < 0 || args.Length() > 0) SWIG_exception_fail(SWIG_ERROR, "Illegal number of arguments for _wrap_Timer_elapsed.");
-  
-  res1 = SWIG_ConvertPtr(args.Holder(), &argp1,SWIGTYPE_p_Timer, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Timer_elapsed" "', argument " "1"" of type '" "Timer const *""'"); 
-  }
-  arg1 = reinterpret_cast< Timer * >(argp1);result = (double)((Timer const *)arg1)->elapsed();
-  jsresult = SWIG_From_double(static_cast< double >(result));
-  
-  
-  SWIGV8_RETURN(jsresult);
-  
-  goto fail;
-fail:
-  SWIGV8_RETURN(SWIGV8_UNDEFINED());
-}
-
-
 static void _wrap_delete_Timer(const v8::WeakCallbackInfo<SWIGV8_Proxy> &data) {
   SWIGV8_Proxy *proxy = data.GetParameter();
   
@@ -1544,22 +1497,96 @@ static void _wrap_delete_Timer(const v8::WeakCallbackInfo<SWIGV8_Proxy> &data) {
 }
 
 
+static SwigV8ReturnValue _wrap_Timer_start(const SwigV8Arguments &args) {
+  SWIGV8_HANDLESCOPE();
+  
+  SWIGV8_VALUE jsresult;
+  Timer *arg1 = (Timer *) 0 ;
+  int arg2 ;
+  Callback arg3 = (Callback) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  
+  if (args.Length() < 2 || args.Length() > 2) SWIG_exception_fail(SWIG_ERROR, "Illegal number of arguments for _wrap_Timer_start.");
+  
+  res1 = SWIG_ConvertPtr(args.Holder(), &argp1,SWIGTYPE_p_Timer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Timer_start" "', argument " "1"" of type '" "Timer *""'"); 
+  }
+  arg1 = reinterpret_cast< Timer * >(argp1);ecode2 = SWIG_AsVal_int(args[0], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Timer_start" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);{
+    {
+      int res = SWIG_ConvertFunctionPtr(args[1], (void**)(&arg3), SWIGTYPE_p_f___void);
+      if (!SWIG_IsOK(res)) {
+        SWIG_exception_fail(SWIG_ArgError(res), "in method '" "Timer_start" "', argument " "3"" of type '" "Callback""'"); 
+      }
+    }
+  }
+  (arg1)->start(arg2,arg3);
+  jsresult = SWIGV8_UNDEFINED();
+  
+  
+  
+  
+  SWIGV8_RETURN(jsresult);
+  
+  goto fail;
+fail:
+  SWIGV8_RETURN(SWIGV8_UNDEFINED());
+}
+
+
+static SwigV8ReturnValue _wrap_Timer_stop(const SwigV8Arguments &args) {
+  SWIGV8_HANDLESCOPE();
+  
+  SWIGV8_VALUE jsresult;
+  Timer *arg1 = (Timer *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  
+  if (args.Length() < 0 || args.Length() > 0) SWIG_exception_fail(SWIG_ERROR, "Illegal number of arguments for _wrap_Timer_stop.");
+  
+  res1 = SWIG_ConvertPtr(args.Holder(), &argp1,SWIGTYPE_p_Timer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Timer_stop" "', argument " "1"" of type '" "Timer *""'"); 
+  }
+  arg1 = reinterpret_cast< Timer * >(argp1);(arg1)->stop();
+  jsresult = SWIGV8_UNDEFINED();
+  
+  
+  SWIGV8_RETURN(jsresult);
+  
+  goto fail;
+fail:
+  SWIGV8_RETURN(SWIGV8_UNDEFINED());
+}
+
+
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
 static swig_type_info _swigt__p_Timer = {"_p_Timer", "p_Timer|Timer *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_f___void = {"_p_f___void", "Callback|void (*)()", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_Timer,
   &_swigt__p_char,
+  &_swigt__p_f___void,
 };
 
 static swig_cast_info _swigc__p_Timer[] = {  {&_swigt__p_Timer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f___void[] = {  {&_swigt__p_f___void, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_Timer,
   _swigc__p_char,
+  _swigc__p_f___void,
 };
 
 
@@ -1879,8 +1906,8 @@ if (SWIGTYPE_p_Timer->clientdata == 0) {
 
 
   /* register wrapper functions */
-  SWIGV8_AddMemberFunction(_exports_Timer_class, "reset", _wrap_Timer_reset);
-SWIGV8_AddMemberFunction(_exports_Timer_class, "elapsed", _wrap_Timer_elapsed);
+  SWIGV8_AddMemberFunction(_exports_Timer_class, "start", _wrap_Timer_start);
+SWIGV8_AddMemberFunction(_exports_Timer_class, "stop", _wrap_Timer_stop);
 
 
   /* setup inheritances */
@@ -1912,8 +1939,8 @@ v8::Local<v8::Object> _exports_Timer_obj = _exports_Timer_class_0->GetFunction(c
 
 #if defined(BUILDING_NODE_EXTENSION)
 #if (NODE_MODULE_VERSION < 64)
-NODE_MODULE(example, example_initialize)
+NODE_MODULE(timer, timer_initialize)
 #else
-NODE_MODULE_CONTEXT_AWARE(example, example_initialize)
+NODE_MODULE_CONTEXT_AWARE(timer, timer_initialize)
 #endif
 #endif

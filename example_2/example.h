@@ -1,21 +1,24 @@
-// Timer.h
-#pragma once
+#ifndef EXAMPLE_H
+#define EXAMPLE_H
+
+#include <iostream>
 #include <chrono>
+#include <thread>
+#include <functional>
+
+typedef void (*Callback)();
+
 
 class Timer {
 public:
-    Timer() : start_time(std::chrono::high_resolution_clock::now()) {}
-
-    void reset() {
-        start_time = std::chrono::high_resolution_clock::now();
-    }
-
-    double elapsed() const {
-        auto end_time = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-        return duration.count() * 0.001; // Convert microseconds to milliseconds
-    }
-
+    Timer();
+    ~Timer();
+    void start(int duration, Callback callback);
+    void stop();
 private:
-    std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+    std::thread timerThread;
+    bool running = false;
 };
+
+
+#endif

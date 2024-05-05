@@ -1,11 +1,11 @@
-// example.js
-const example = require('./build/Release/example.node');
+const timerModule = require('./build/Release/example');
+const timer = new timerModule.Timer();
 
-// // Create a new instance of Timer
-// const timer = new example.Timer();
+function callback()
+{
+  console.log('Timer expired after 3 seconds');
 
-// // Perform some operations
-// // For example, let's wait for 1 second (1000 milliseconds)
-// setTimeout(() => {
-//     console.log('Elapsed time:', timer.elapsed(), 'milliseconds');
-// }, 1000);
+}
+
+// Start the timer with a 3000 ms timeout
+timer.start(3000, callback());
