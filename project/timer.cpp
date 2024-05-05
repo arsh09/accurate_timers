@@ -26,47 +26,57 @@ public:
             Stop();
         }
 
-        napi_status status = napi_create_reference(env_, callback, 1, &callback_);
-        if (status != napi_ok)
-        { 
-            std::cout << "Start: napi_create_reference()" << status << std::endl; 
-             return;
-        }
+        napi_status status = napi_create_threadsafe_function(
+            env_,
+            callback,
+            nullptr,
+            nullptr,
+            // napi_create_string_utf8(env_, "Timer Callback", NAPI_AUTO_LENGTH),
+            0,
+            1,
+            nullptr,
+            nullptr,
+            nullptr,
+            CallJs,
+            &js_callback_ref
+        );
+        
+        if (status != napi_ok) { std::cout << "Start: napi_create_threadsafe_function() " << status << std::endl; }
 
-        std::cout << "Starting the timer" << std::endl;
+
         active_ = true;
-        std::thread([this, callback, delay]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-            if (active_) {
-                napi_status ret_err_;
-                napi_handle_scope scope;
-                napi_value global;
-                napi_value cb;
-                napi_value result;
-
-                 ret_err_ = napi_open_handle_scope(env_, &scope);
-                if (ret_err_ != napi_ok) { std::cout << "Start: napi_open_handle_scope()" << std::endl; }
-                ret_err_ = napi_get_global(env_, &global);
-                if (ret_err_ != napi_ok) { std::cout << "Start: napi_get_global()" << std::endl; }
-                ret_err_ = napi_get_reference_value(env_, callback_, &cb);
-                if (ret_err_ != napi_ok) { std::cout << "Start: napi_get_reference_value()" << std::endl; }
-                ret_err_ = napi_call_function(env_, global, cb, 0, nullptr, &result);
-                if (ret_err_ != napi_ok) { std::cout << "Start: napi_call_function()" << std::endl; }
-                ret_err_ = napi_close_handle_scope(env_, scope);
-                if (ret_err_ != napi_ok) { std::cout << "Start: napi_close_handle_scope()" << std::endl; }
+        worker = std::thread([this, delay]() {
+            if (active_)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+                std::cout << "Timer ends " << std::endl;
+                napi_call_threadsafe_function(js_callback_ref, nullptr, napi_tsfn_blocking);
             }
+           
         });
-        // .detach();
+
+        worker.detach();
     }
 
     void Stop() {
         active_ = false;
+        if ( worker.joinable() ) { worker.join(); }
+    }
+
+    static void CallJs(napi_env env, napi_value js_callback, void* context, void* data) {
+        // Call the JavaScript callback
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        napi_call_function(env, undefined, js_callback, 0, nullptr, nullptr);
     }
 
 private:
     napi_env env_;
     napi_ref callback_;
+    napi_threadsafe_function js_callback_ref;
     bool active_;
+    std::thread worker;
+    
 };
 
 
@@ -75,7 +85,7 @@ napi_value CreateTimer(napi_env env, napi_callback_info info) {
     napi_value jsthis;
     napi_valuetype val_type;
     napi_status ret_err_;
-
+    
     ret_err_= napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
     if (ret_err_ != napi_ok) { std::cout << "CreateTimer: napi_get_cb_info()" << std::endl; }
 
@@ -106,27 +116,27 @@ napi_value StartTimer(napi_env env, napi_callback_info info) {
     std::cout << "Delay: " << (int) delay << std::endl;
  
     // // test if the function gets called
-    napi_ref callback_;
-    napi_handle_scope scope;
-    napi_value global;
-    napi_value cb;
-    napi_value result;
+    // napi_ref callback_;
+    // napi_handle_scope scope;
+    // napi_value global;
+    // napi_value cb;
+    // napi_value result;
 
-    ret_err_ = napi_create_reference(env, args[1], 1, &callback_);
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_create_reference()" << std::endl; }
-    ret_err_ = napi_open_handle_scope(env, &scope);
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_open_handle_scope()" << std::endl; }
-    ret_err_ = napi_get_global(env, &global);
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_global()" << std::endl; }
-    ret_err_ = napi_get_reference_value(env, callback_, &cb);
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_reference_value()" << std::endl; }
-    ret_err_ = napi_call_function(env, global, cb, 0, nullptr, &result);
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_call_function()" << std::endl; }
-    ret_err_ = napi_close_handle_scope(env, scope);
-    if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_close_handle_scope()" << std::endl; }
+    // ret_err_ = napi_create_reference(env, args[1], 1, &callback_);
+    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_create_reference()" << std::endl; }
+    // ret_err_ = napi_open_handle_scope(env, &scope);
+    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_open_handle_scope()" << std::endl; }
+    // ret_err_ = napi_get_global(env, &global);
+    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_global()" << std::endl; }
+    // ret_err_ = napi_get_reference_value(env, callback_, &cb);
+    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_get_reference_value()" << std::endl; }
+    // ret_err_ = napi_call_function(env, global, cb, 0, nullptr, &result);
+    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_call_function()" << std::endl; }
+    // ret_err_ = napi_close_handle_scope(env, scope);
+    // if (ret_err_ != napi_ok) { std::cout << "StartTimer: napi_close_handle_scope()" << std::endl; }
 
     if (obj!=nullptr){
-        std::cout << "Works? " << std::endl;
+        obj->Say();
         obj->Start(delay, args[1]);
     } 
 
