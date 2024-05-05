@@ -2,10 +2,12 @@
 
 ```bash
 $ npm install -g node-gyp
+$ npm install --save accurate_timer 
 ```
 
-```bash 
-$ swig -javascript -node -c++ -o example_wrap.cpp example.i 
-$ node-gyp configure build 
-$ node runme.js
+### Example
+
+```javascript
+
+
 ```

@@ -31,7 +31,7 @@ public:
             CallJs,
             &js_callback_ref
         );
-        napi_throw_error(env, nullptr, "Unable to set the thread-safe callback for the AccurateTimer")
+        napi_throw_error(env, nullptr, "Unable to set the thread-safe callback for the AccurateTimer");
 
     }
 
@@ -84,11 +84,11 @@ napi_value StartTimer(napi_env env, napi_callback_info info) {
     napi_value jsthis;
 
     ret_err_ = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
-    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the timer callback arguments") }
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the timer callback arguments"); }
 
     AccurateTimer* timer;
     ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&timer));
-    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to wrap the class pointer") }
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to wrap the class pointer"); }
  
     if (timer!=nullptr){
         timer->Start();
@@ -102,11 +102,11 @@ napi_value StopTimer(napi_env env, napi_callback_info info) {
     napi_status ret_err_;
 
     ret_err_ = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
-    if (ret_err_ != napi_ok) {  napi_throw_error(env, nullptr, "Unable to get the timer callback arguments") }
+    if (ret_err_ != napi_ok) {  napi_throw_error(env, nullptr, "Unable to get the timer callback arguments"); }
 
     AccurateTimer* timer;
     ret_err_ = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&timer));
-    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to unwrap the AccurateTimer class pointer") }
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to unwrap the AccurateTimer class pointer"); }
 
     if (timer !=nullptr){
         timer->Stop();
@@ -123,17 +123,17 @@ napi_value NewTimer(napi_env env, napi_callback_info info) {
     napi_status ret_err_;
     napi_value jsthis;
     ret_err_ = napi_get_cb_info(env, info, &argc, args, &jsthis, nullptr);
-    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the timer callback arguments") }
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the timer callback arguments"); }
 
     int delay; 
     ret_err_ = napi_get_value_int32(env, args[0], &delay);
-    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the delay value for the timer") }
+    if (ret_err_ != napi_ok) { napi_throw_error(env, nullptr, "Unable to get the delay value for the timer"); }
 
     AccurateTimer* timer = new AccurateTimer(env, args[1], delay);
     ret_err_ = napi_wrap(env, jsthis, timer, [](napi_env env, void* finalize_data, void* hint) {
         delete static_cast<AccurateTimer*>(finalize_data);
     }, nullptr, nullptr);
-    if (ret_err_ != napi_ok) {napi_throw_error(env, nullptr, "Unable to wrap the AccurateTimer class") }
+    if (ret_err_ != napi_ok) {napi_throw_error(env, nullptr, "Unable to wrap the AccurateTimer class"); }
 
     return jsthis;
 }

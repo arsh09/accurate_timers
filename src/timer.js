@@ -1,10 +1,10 @@
-const addon = require('./build/Release/timer');
+const AccurateTimer = require("accurate_timer");
 
 let old_time = new Date().getTime()
 
-let timer = new addon.AccurateTimer(20, () => {
+let timer = new AccurateTimer(20, () => {
     const dt = ( new Date().getTime() - old_time );
-    console.log("Timer expired after 1 second: ", dt)
+    console.log(`Time elapsed: ${dt}-ms`)
     old_time = new Date().getTime()
 });
 

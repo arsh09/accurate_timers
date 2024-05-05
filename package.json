@@ -1,0 +1,28 @@
+{
+  "name": "accurate-timer",
+  "version": "1.0.0",
+  "description": "High resolution timers for Node.js using native C++ bindings.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node-gyp rebuild"
+  },
+  "files": [
+    "src/**/*",
+    "index.js",
+    "binding.gyp"
+  ],
+  "keywords": [
+    "timer",
+    "high-resolution",
+    "native"
+  ],
+  "author": "Arshad Khan",
+  "license": "ISC",
+  "gypfile": true,
+  "dependencies": {},
+  "devDependencies": {
+    "node-addon-api": "^8.0.0",
+    "node-gyp": "^10.1.0"
+  }
+}

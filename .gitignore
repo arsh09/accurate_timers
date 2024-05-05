@@ -1,8 +1,3 @@
-swigwin-4.2.1/
-
-example_1/build
-example_2/build
-example_3/build
-
-project/node_modules
-project/build
+./.vscode
+node_modules
+build
