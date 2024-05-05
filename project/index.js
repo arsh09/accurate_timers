@@ -1,6 +1,5 @@
 const addon = require('./build/Release/timer');
 
-console.log("ADFADF")
 let timer = addon.createTimer();
 
 timer.start(200, () => console.log("Timer expired after 1 second"));
