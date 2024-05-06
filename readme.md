@@ -21,5 +21,6 @@ let timer = new AccurateTimer(20, () => {
 });
 
 timer.start()
-setTimeout(() => timer.stop(), 15000); 
+
+setTimeout(() => timer.stop(), 15000);  
 ```

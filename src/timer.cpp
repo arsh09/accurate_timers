@@ -15,8 +15,10 @@ public:
 
         napi_status status;
         napi_value fn_name; 
-        status = napi_create_string_utf8(env, "Timer Callback", NAPI_AUTO_LENGTH, &fn_name),
-        assert( status == napi_ok );
+        status = napi_create_string_utf8(env, "Timer Callback", NAPI_AUTO_LENGTH, &fn_name);
+        if ( status != napi_ok) {
+            napi_throw_error(env, nullptr, "Unable to cretae utf8 string");
+        }
 
         status = napi_create_threadsafe_function(
             env,
@@ -31,7 +33,9 @@ public:
             CallJs,
             &js_callback_ref
         );
-        napi_throw_error(env, nullptr, "Unable to set the thread-safe callback for the AccurateTimer");
+        if ( status != napi_ok) {
+            napi_throw_error(env, nullptr, "Unable to set the thread-safe callback for the AccurateTimer");
+        }
 
     }
 

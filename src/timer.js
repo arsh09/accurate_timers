@@ -1,4 +1,4 @@
-const AccurateTimer = require("accurate_timer");
+const AccurateTimer =  require('../build/Release/accurate_timers').AccurateTimer;
 
 let old_time = new Date().getTime()
 
