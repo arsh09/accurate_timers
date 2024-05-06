@@ -1,2 +1,2 @@
 const addon = require('./build/Release/accurate_timers');
-module.exports = addon;
+module.exports = addon.AccurateTimer;
