@@ -27,7 +27,7 @@ setTimeout(() => timer.stop(), 15000);
 
 ### Possible Usecase 
 
-There are a lot of ElectronJS application out there that requires a better timer module. The reason being that `setInterval` tends to queue in NodeJS uv-event management. The motivation for this module comes from improving a bottleneck introduced due to `setInterval` for a biofeedback software written in Vue-ElectronJS. Replacing the `setInterval` improves not only the performance and reactivity of the overall all, it frees up the event queue for Node processes as well.
+There are a lot of ElectronJS application out there that requires a better timer module. The reason being that `setInterval` tends to queue in NodeJS uv-event management. The motivation for this module comes from removing a bottleneck introduced due to `setInterval` for a biofeedback software written in Vue-ElectronJS. Replacing the `setInterval` improves not only the performance and reactivity of the overall app, it alsp frees up the event queue for Node processes as well.
 
 ### ToDos
 
